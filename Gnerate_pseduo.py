@@ -1,8 +1,6 @@
 import torch
-from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torch.backends import cudnn
-from dataloaders.dataset import TwoStreamBatchSampler
 from utils.dataset_loader_cvpr import MyData
 import os
 import argparse
@@ -25,7 +23,7 @@ from PIL import Image
 os.environ["WANDB_MODE"] = "dryrun"
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
-fs_observer = os.path.join(BASE_PATH, "MICAD_results")
+fs_observer = os.path.join(BASE_PATH, "MPNN_results")
 if not os.path.exists(fs_observer):
 	os.makedirs(fs_observer)
 np.set_printoptions(threshold=np.inf)
@@ -78,21 +76,7 @@ parser.add_argument('--value', type=float, default=0.92,
 parser.add_argument('--number', type=int, default=6,
 					help='2-6')
 
-
-def ave(label_batch):
-	most_frequent_values, _ = torch.mode(torch.stack(label_batch), dim=0)
-	return most_frequent_values
-
-#############
 args = parser.parse_args()
-
-save_best_name = "MICAD_best_" + str(args.number)
-
-
-
-W_name = save_best_name
-experiment = wandb.init(project='Mutil_MICAD_Unet', resume='allow', anonymous='must', name=W_name)
-experiment.config.update(dict(batch_size=args.batch_size, learning_rate=args.base_lr))
 
 loss_fn = CrossEntropyLoss(ignore_index=3)
 device = torch.device('cuda:' + str(args.gpu) if torch.cuda.is_available() else 'cpu')
@@ -167,7 +151,7 @@ def sigmoid_mse_loss(input_logits, target_logits):
     mse_loss = (input_softmax-target_softmax)**2
     return mse_loss
 
-def train_epoch(phase, epoch, model,ema_model, dataloader, loss_fn):
+def train_epoch(phase, epoch, model, dataloader, loss_fn):
 	progress_bar = tqdm(dataloader, desc="Epoch {} - {}".format(epoch, phase))
 	training = phase == "train"
 
@@ -197,25 +181,13 @@ def train_epoch(phase, epoch, model,ema_model, dataloader, loss_fn):
 			
 	mean_loss = total_loss
 
-	# outputs_image = outputs_soft.argmax(dim=1)
-
 	info = {"loss": mean_loss,
 			}
-	
-	# experiment.log({
-	# 	"train_loss": mean_loss,
-	# 	'train_images': wandb.Image(volume_batch[0].cpu()),
-	# 	'train_masks': {
-	# 		'train_true1': wandb.Image(targets[0].float().cpu()),
-	# 		'train_pred1': wandb.Image(outputs_image[0].float().cpu()),
-	# 	}
-	# })
 
 	return info
 
 #main
 def main(args, device, multask=True):
-	batch_size = args.batch_size
 	base_lr = args.base_lr
 	patience = args.patience
 	def create_model(ema=False):
@@ -228,9 +200,6 @@ def main(args, device, multask=True):
 		random.seed(args.seed + worker_id)
 
 	model = create_model()
-	ema_model = create_model(ema=True)
-
-	best_model_path = os.path.join(fs_observer, save_best_name)
 
 	#load data
 	train_sub = MyData(args.train_dataroot, DF=['BinRushed', 'MESSIDOR'], transform=True)
@@ -246,7 +215,7 @@ def main(args, device, multask=True):
 	epochs = range(0, args.max_iterations // total_slices + 1)
 
 	for epoch in epochs:
-		info["train"] = train_epoch("train", epoch, model=model, ema_model=ema_model, dataloader=train_loader,
+		info["train"] = train_epoch("train", epoch, model=model, dataloader=train_loader,
 									loss_fn=loss_fn)
 		
 
