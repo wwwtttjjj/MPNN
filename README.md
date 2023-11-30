@@ -6,3 +6,7 @@ ARXIV:
 
 DATASET:链接：https://pan.baidu.com/s/1dQFsbQO485AD7csSGxIBQw 
 提取码：3lhn
+
+将下载的数据放在在这个目录。
+
+训练	python MPNN.py;
