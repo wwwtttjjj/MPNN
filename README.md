@@ -1,6 +1,6 @@
 # Accurate Segmentation of Optic Disc And Cup from Multiple Pseudo-labels by Noise-Aware Learning
 
-ARXIV:
+ARXIV:[[2311.18496\] Accurate Segmentation of Optic Disc And Cup from Multiple Pseudo-labels by Noise-Aware Learning (arxiv.org)](https://arxiv.org/abs/2311.18496)
 
 包含了创建好的标签和伪标签，生成伪标签时没有固定种子。
 
