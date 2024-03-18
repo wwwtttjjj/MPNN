@@ -8,7 +8,7 @@
 python generate_pseudo.py
 ```
 
-Contains created labels and pseudo-labels. There is no fixed seed when generating pseudo-labels：https://pan.baidu.com/s/1dQFsbQO485AD7csSGxIBQw 
+Contains created labels and pseudo-labels. There is no fixed seed when generating pseudo-labels：https://pan.baidu.com/s/1dQFsbQO485AD7csSGxIBQw （the first data is the original RIGA dataset）
 
 ## Training
 
