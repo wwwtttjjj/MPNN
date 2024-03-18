@@ -240,7 +240,7 @@ def train_epoch(phase, epoch, model,ema_model, dataloader, loss_fn):
 		# 	# print(path + '/mask/'+ str(iter_num)+'.png')
 		# 	Image.fromarray(label_batch0).save(path + '/mask/'+ str(iter_num)+'.png')
 
-		sup_loss = torch.mean(loss_fn(outputs, targets[0]))
+		sup_loss = torch.mean(loss_fn(outputs, target))
 
 
 		consistency_weight = get_current_consistency_weight(iter_num // 150)
